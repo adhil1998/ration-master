@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
-import dj_database_url
+from pathlib import Path
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -27,32 +27,7 @@ SECRET_KEY = 'django-insecure-j23-ovjv2!7onh+4ictq=9hk(a=@um^ms)8(pntx__jicqv@p%
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_METHODS = (
-    'GET',
-    'POST',
-    'PUT',
-    'PATCH',
-    'DELETE',
-    'OPTIONS'
-)
-CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-disposition',
-    'content-type',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-    # Custom added
-    'user-id',
-    'bearer',
-    'otp'
-]
-CORS_PREFLIGHT_MAX_AGE = 86400
-CORS_ALLOW_CREDENTIALS = True
+
 
 # Application definition
 
@@ -67,7 +42,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_extensions',
     'accounts',
-    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -78,7 +52,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'ration_master.urls'
@@ -120,8 +93,14 @@ WSGI_APPLICATION = 'ration_master.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default='postgres://kltpnvuvshufta:249c5aed67e0344292bf349ab9ec4719f4303e9ccfd1f535d53ebbea1057afe5@ec2-18-210-191-5.compute-1.amazonaws.com:5432/dejlpl1ui3llpv')
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'ration_master',
+        'USER': 'ration_master',
+        'PASSWORD': 'ration_master',
+        'PORT': '5432',
+        'HOST': 'localhost'
+    }
 }
 
 
@@ -159,15 +138,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_ROOT = 'staticfiles'
-STATIC_URL = '/static/'
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
+STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.User'
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
