@@ -2,11 +2,11 @@ from rest_framework.generics import ListAPIView, ListCreateAPIView, \
     CreateAPIView, RetrieveAPIView
 
 from accounts.constants import OTPType
-from accounts.filter import CardFilter
+from accounts.filter import CardFilter, ShopFilter
 from accounts.serializers import *
 from accounts.models import Admin, RationShop, OtpToken
 from common.exceptions import BadRequest
-from common.permissions import IsAuthenticated
+from common.permissions import IsAuthenticated, IsAdmin, MultiPermissionView, IsShop
 from common.functions import success_response
 from common.services import send_otp
 from rest_framework.views import APIView
@@ -19,14 +19,25 @@ class AdminCreateView(CreateAPIView, RetrieveAPIView):
     queryset = Admin.objects.all()
 
 
-class ShopCreateView(ListCreateAPIView, RetrieveAPIView):
+class ShopCreateView(ListCreateAPIView, RetrieveAPIView, MultiPermissionView):
     """Serializer for lis and create User(s)"""
+    permissions = {
+        'GET': (
+            IsAuthenticated, IsAdmin),
+        'POST': ()
+    }
     serializer_class = ShopSerializer
     queryset = RationShop.objects.all()
+    filterset_class = ShopFilter
 
 
-class CardCreateView(ListCreateAPIView, RetrieveAPIView):
+class CardCreateView(ListCreateAPIView, RetrieveAPIView, MultiPermissionView):
     """Serializer for lis and create User(s)"""
+    permissions = {
+        'GET': (
+            IsAuthenticated, IsAdmin or IsShop),
+        'POST': ()
+    }
     serializer_class = CardSerializer
     queryset = Card.objects.all()
     filterset_class = CardFilter
