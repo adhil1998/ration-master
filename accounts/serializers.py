@@ -44,7 +44,7 @@ class ShopSerializer(serializers.ModelSerializer):
         model = RationShop
         fields = ['username', 'idencode', 'email', 'mobile', 'password',
                   'first_name', 'last_name', 'employee_name', 'employee_id',
-                  'location']
+                  'location', 'verified']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -69,7 +69,7 @@ class CardSerializer(serializers.ModelSerializer):
         """meta info"""
         model = Card
         fields = ['idencode', 'email', 'mobile', 'card_number', 'holder_name',
-                  'card_type']
+                  'card_type', 'verified']
 
     def create(self, validated_data):
         """Override user creation"""
@@ -90,6 +90,9 @@ class LoginSerializer(serializers.Serializer):
         user = authenticate(username=username, password=password)
         if not user:
             raise UnauthorizedAccess('Not valid credentials')
+        if user.type == UserType.SHOP.value:
+            if not user.rationshop.verified:
+                raise BadRequest("NOT VERIFIED")
         return user
 
     def to_representation(self, instance):
@@ -119,6 +122,8 @@ class LoginOTPSerializer(serializers.Serializer):
         if datetime.now() > otp.expired_in.replace(tzinfo=None):
             raise BadRequest("OTP EXPIRED")
         otp.refresh()
+        if not card.verified:
+            raise BadRequest("Card not verified")
         return card
 
     def to_representation(self, instance):

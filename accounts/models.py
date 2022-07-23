@@ -19,7 +19,7 @@ class User(AbstractUser):
     """User model"""
     type = IntegerField(default=UserType.CARD,
                         choices=UserType.choices())
-    mobile = CharField(max_length=15, default='',)
+    mobile = CharField(max_length=15, default='', unique=True)
 
     def issue_access_token(self):
         """Function to get or create user access token."""
@@ -126,7 +126,7 @@ class OtpToken(AbstractBaseModel):
     otp = IntegerField(null=True)
     is_active = BooleanField(default=False)
     type = IntegerField(default=None, choices=OTPType.choices())
-    expired_in = DateTimeField(default=datetime.now() + timedelta(minutes=10))
+    expired_in = DateTimeField(default=None)
 
     def __str__(self):
         return self.user.username + str(self.otp)

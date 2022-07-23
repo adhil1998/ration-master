@@ -2,6 +2,7 @@ from rest_framework.generics import ListAPIView, ListCreateAPIView, \
     CreateAPIView, RetrieveAPIView
 
 from accounts.constants import OTPType
+from accounts.filter import CardFilter
 from accounts.serializers import *
 from accounts.models import Admin, RationShop, OtpToken
 from common.exceptions import BadRequest
@@ -18,16 +19,17 @@ class AdminCreateView(CreateAPIView, RetrieveAPIView):
     queryset = Admin.objects.all()
 
 
-class ShopCreateView(CreateAPIView, RetrieveAPIView):
+class ShopCreateView(ListCreateAPIView, RetrieveAPIView):
     """Serializer for lis and create User(s)"""
     serializer_class = ShopSerializer
     queryset = RationShop.objects.all()
 
 
-class CardCreateView(CreateAPIView, RetrieveAPIView):
+class CardCreateView(ListCreateAPIView, RetrieveAPIView):
     """Serializer for lis and create User(s)"""
     serializer_class = CardSerializer
-    queryset = RationShop.objects.all()
+    queryset = Card.objects.all()
+    filterset_class = CardFilter
 
 
 class LoginView(CreateAPIView):
