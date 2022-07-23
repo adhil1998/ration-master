@@ -6,7 +6,7 @@ from accounts.filter import CardFilter, ShopFilter
 from accounts.serializers import *
 from accounts.models import Admin, RationShop, OtpToken
 from common.exceptions import BadRequest
-from common.permissions import IsAuthenticated, IsAdmin, MultiPermissionView, IsShop
+from common.permissions import IsAuthenticated, IsAdmin, MultiPermissionView, IsShop, IsCard
 from common.functions import success_response, decode
 from common.services import send_otp
 from rest_framework.views import APIView
@@ -100,3 +100,25 @@ class VerifyCardView(UpdateAPIView):
             return success_response('shop is verified now')
         except:
             raise BadRequest("INVALID ID")
+
+
+class MemberListCreate(ListCreateAPIView, MultiPermissionView):
+    """View for list and create member"""
+    permissions = permissions = {
+        'GET': (IsAuthenticated,),
+        'POST': (IsAuthenticated, IsCard)
+    }
+    serializer_class = MemberSerializer
+
+    def get_queryset(self):
+        """Override queryset"""
+        user = self.kwargs['user']
+        try:
+            if user.type == UserType.CARD:
+                queryset = Member.objects.filter(card=user)
+            else:
+                queryset = Member.objects.filter(
+                    card__id=decode(self.request.GET.get('card')))
+            return queryset
+        except:
+            raise BadRequest('INVALID DATA')

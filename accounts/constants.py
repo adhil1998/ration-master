@@ -22,6 +22,7 @@ class CardType(ChoiceAdapter):
     YELLOW = 100
     PINK = 200
     WHITE = 300
+    BLUE = 400
 
 
 class AgeGroupType(ChoiceAdapter):

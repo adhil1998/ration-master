@@ -6,7 +6,7 @@ from django.db.models import Sum, F
 from django.contrib.auth import authenticate
 
 from accounts.constants import UserType
-from accounts.models import User, Admin, RationShop, Card, OtpToken
+from accounts.models import User, Admin, RationShop, Card, OtpToken, Member
 from common.exceptions import UnauthorizedAccess, BadRequest
 from common.fields import KWArgsObjectField
 
@@ -135,3 +135,18 @@ class LoginOTPSerializer(serializers.Serializer):
             "bearer": instance.issue_access_token(),
         }
         return data
+
+
+class MemberSerializer(serializers.ModelSerializer):
+    """Serializer for contacts"""
+    card = KWArgsObjectField(write_only=True)
+
+    class Meta:
+        model = Member
+        fields = ['name', 'age', 'age_group', 'idencode',
+                  'gender', 'card', 'occupation']
+
+    def create(self, validated_data):
+        """Override create"""
+        contact = super(MemberSerializer, self).create(validated_data)
+        return contact

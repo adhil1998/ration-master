@@ -60,6 +60,7 @@ class IsCard(permissions.BasePermission):
 
     def has_permission(self, request, view):
         if view.kwargs['user'].type == UserType.CARD:
+            view.kwargs['card'] = view.kwargs['user'].card
             return True
         raise BadRequest("No permission")
 
