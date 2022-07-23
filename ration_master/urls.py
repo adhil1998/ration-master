@@ -25,5 +25,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # Apps
     re_path('accounts/', include('accounts.urls')),
+    re_path('supply/', include('supply.urls')),
     # re_path('supply/', include('supply.urls')),
 ]

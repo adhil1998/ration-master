@@ -4,7 +4,7 @@ from django.db.models import IntegerField, CharField, \
 
 from common.functions import encode
 from common.models import AbstractBaseModel
-from supply.constants import UnitType
+from supply.constants import UnitType, TokenStatus
 from accounts.models import RationShop, User, Card
 from accounts.constants import CardType, AgeGroupType
 
@@ -15,6 +15,10 @@ from accounts.constants import CardType, AgeGroupType
 class Product(AbstractBaseModel):
     """Store product details"""
     name = CharField(max_length=100, default='')
+    unit = IntegerField(default=UnitType.KG, choices=UnitType.choices())
+
+    def __str__(self):
+        return self.name + ' ' + self.unit
 
 
 class Stock(AbstractBaseModel):
@@ -22,7 +26,6 @@ class Stock(AbstractBaseModel):
     product = ForeignKey(Product, on_delete=models.CASCADE)
     shop = ForeignKey(RationShop, on_delete=models.CASCADE)
     quantity = IntegerField()
-    unit = IntegerField(default=UnitType.KG, choices=UnitType.choices())
 
 
 class Token(AbstractBaseModel):
@@ -31,6 +34,8 @@ class Token(AbstractBaseModel):
     RationShop = ForeignKey(RationShop, on_delete=models.CASCADE)
     number = IntegerField()
     time = DateTimeField(default=None)
+    status = IntegerField(default=TokenStatus.INITIATED,
+                          choices=TokenStatus.choices())
 
 
 class Purchase(AbstractBaseModel):
