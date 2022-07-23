@@ -17,7 +17,7 @@ class User(AbstractUser):
     """User model"""
     type = IntegerField(default=UserType.CARD,
                         choices=UserType.choices())
-    mobile = CharField(max_length=15, default='')
+    mobile = CharField(max_length=15, default='',)
 
     def issue_access_token(self):
         """Function to get or create user access token."""
@@ -38,6 +38,10 @@ class User(AbstractUser):
 class Admin(User):
     """To store admin details"""
     district = CharField(max_length=50, default='')
+    dob = DateTimeField(default=None, null=True, blank=True)
+
+    class Meta:
+        verbose_name_plural = 'Admins'
 
 
 class RationShop(User):
@@ -45,6 +49,9 @@ class RationShop(User):
     employee_name = CharField(max_length=100, default='')
     employee_id = CharField(max_length=15, default='')
     location = CharField(max_length=100, default='')
+
+    class Meta:
+        verbose_name_plural = 'RationShops'
 
     def __str__(self):
         return self.username + self.employee_name + self.employee_id
@@ -55,6 +62,9 @@ class Card(User):
     card_number = IntegerField()
     holder_name = CharField(max_length=100, default='')
     card_type = IntegerField()
+
+    class Meta:
+        verbose_name_plural = 'Cards'
 
     def __str__(self):
         return self.username + self.holder_name
@@ -68,6 +78,9 @@ class Member(AbstractBaseModel):
     age_group = IntegerField(default=None, choices=AgeGroupType.choices())
     gender = IntegerField(default=None, choices=GenderType.choices())
     occupation = CharField(max_length=100, default=None)
+
+    def __str__(self):
+        return self.name + self.card.card_number
 
 
 class AccessToken(models.Model):
