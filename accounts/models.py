@@ -7,7 +7,7 @@ from django.utils.crypto import get_random_string
 
 from common.functions import encode
 from common.models import AbstractBaseModel
-from accounts.constants import UserType, OTPType, GenderType
+from accounts.constants import UserType, OTPType, GenderType, AgeGroupType
 
 
 # Create your models here.
@@ -65,6 +65,7 @@ class Member(AbstractBaseModel):
     card = ForeignKey(Card, on_delete=models.CASCADE)
     name = CharField(max_length=100, default='')
     age = IntegerField(default=None)
+    age_group = IntegerField(default=None, choices=AgeGroupType.choices())
     gender = IntegerField(default=None, choices=GenderType.choices())
     occupation = CharField(max_length=100, default=None)
 
