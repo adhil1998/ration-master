@@ -1,5 +1,5 @@
 from rest_framework.generics import ListAPIView, ListCreateAPIView, \
-    CreateAPIView, RetrieveAPIView
+    CreateAPIView, RetrieveAPIView, UpdateAPIView
 
 from accounts.constants import OTPType
 from accounts.filter import CardFilter, ShopFilter
@@ -7,7 +7,7 @@ from accounts.serializers import *
 from accounts.models import Admin, RationShop, OtpToken
 from common.exceptions import BadRequest
 from common.permissions import IsAuthenticated, IsAdmin, MultiPermissionView, IsShop
-from common.functions import success_response
+from common.functions import success_response, decode
 from common.services import send_otp
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -68,5 +68,35 @@ class CreateOtp(APIView):
             # send_otp(card.mobile, body)
         except Exception as e:
             raise BadRequest('INVALID CARD NUMBER' + str(e))
-        data = {"hello": "world"}
+        data = {"otp": otp.otp}
         return Response(data)
+
+
+class VerifyShopView(APIView):
+    """to verify shops"""
+    permission_classes = (IsAuthenticated, IsAdmin)
+
+    def patch(self, request, *args, **kwargs):
+        """Override get method"""
+        try:
+            shop = RationShop.objects.get(id=kwargs['pk'])
+            shop.verified = True
+            shop.save()
+            return success_response('shop is verified now')
+        except:
+            raise BadRequest("INVALID ID")
+
+
+class VerifyCardView(UpdateAPIView):
+    """to verify shops"""
+    permission_classes = (IsAuthenticated, IsAdmin)
+
+    def get(self, request, *args, **kwargs):
+        """Override get method"""
+        try:
+            shop = Card.objects.get(id=kwargs['pk'])
+            shop.verified = True
+            shop.save()
+            return success_response('shop is verified now')
+        except:
+            raise BadRequest("INVALID ID")

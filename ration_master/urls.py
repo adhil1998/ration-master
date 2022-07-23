@@ -19,6 +19,8 @@ from django.urls import path, re_path, register_converter
 from django.conf.urls import include
 from common import converters
 
+register_converter(converters.IDConverter, 'idencode')
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     # Apps

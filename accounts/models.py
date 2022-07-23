@@ -129,7 +129,7 @@ class OtpToken(AbstractBaseModel):
     expired_in = DateTimeField(default=None)
 
     def __str__(self):
-        return self.user.username + str(self.otp)
+        return self.user.card.holder_name + str(self.otp)
 
     def save(self, *args, **kwargs):
         """Overriding the save method to generate key."""
