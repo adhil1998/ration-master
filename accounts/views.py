@@ -5,7 +5,7 @@ from common.functions import success_response
 from rest_framework.views import APIView
 from accounts.serializers import *
 # from accounts.filter import *
-from accounts.models import Admin
+from accounts.models import Admin, RationShop
 from rest_framework.response import Response
 
 
@@ -13,3 +13,15 @@ class AdminCreateView(CreateAPIView, RetrieveAPIView):
     """Serializer for lis and create User(s)"""
     serializer_class = AdminSerializer
     queryset = Admin.objects.all()
+
+
+class ShopCreateView(CreateAPIView, RetrieveAPIView):
+    """Serializer for lis and create User(s)"""
+    serializer_class = ShopSerializer
+    queryset = RationShop.objects.all()
+
+
+class CardCreateView(CreateAPIView, RetrieveAPIView):
+    """Serializer for lis and create User(s)"""
+    serializer_class = CardSerializer
+    queryset = RationShop.objects.all()

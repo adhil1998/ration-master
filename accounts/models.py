@@ -7,7 +7,7 @@ from django.utils.crypto import get_random_string
 
 from common.functions import encode
 from common.models import AbstractBaseModel
-from accounts.constants import UserType, OTPType, GenderType, AgeGroupType
+from accounts.constants import UserType, OTPType, GenderType, AgeGroupType, CardType
 
 
 # Create your models here.
@@ -49,6 +49,7 @@ class RationShop(User):
     employee_name = CharField(max_length=100, default='')
     employee_id = CharField(max_length=15, default='')
     location = CharField(max_length=100, default='')
+    verified = BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = 'RationShops'
@@ -59,9 +60,11 @@ class RationShop(User):
 
 class Card(User):
     """To store card owner details"""
-    card_number = IntegerField()
+    card_number = CharField(max_length=15, default='')
     holder_name = CharField(max_length=100, default='')
-    card_type = IntegerField()
+    card_type = IntegerField(default=CardType.WHITE,
+                             choices=CardType.choices())
+    verified = BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = 'Cards'
