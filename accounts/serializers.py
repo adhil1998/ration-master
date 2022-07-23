@@ -1,11 +1,13 @@
+from datetime import datetime
+
 from rest_framework import serializers
 from rest_framework.serializers import CharField, IntegerField, SerializerMethodField
 from django.db.models import Sum, F
 from django.contrib.auth import authenticate
 
 from accounts.constants import UserType
-from accounts.models import User, Admin, RationShop, Card
-from common.exceptions import UnauthorizedAccess
+from accounts.models import User, Admin, RationShop, Card, OtpToken
+from common.exceptions import UnauthorizedAccess, BadRequest
 from common.fields import KWArgsObjectField
 
 
@@ -75,3 +77,56 @@ class CardSerializer(serializers.ModelSerializer):
         user.type = UserType.CARD
         user.save()
         return user
+
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    password = serializers.CharField(required=True)
+
+    def create(self, validated_data):
+        """Overide login"""
+        username = validated_data['username']
+        password = validated_data['password']
+        user = authenticate(username=username, password=password)
+        if not user:
+            raise UnauthorizedAccess('Not valid credentials')
+        return user
+
+    def to_representation(self, instance):
+        """Override instance output"""
+        data = {
+            "idencode": instance.idencode,
+            "name": instance.username,
+            "type": instance.type,
+            "bearer": instance.issue_access_token(),
+        }
+        return data
+
+
+class LoginOTPSerializer(serializers.Serializer):
+    card_number = serializers.CharField(required=True)
+    otp = serializers.CharField(required=True)
+
+    def create(self, validated_data):
+        """Overide login"""
+        card_number = validated_data['card_number']
+        otp = validated_data['otp']
+        card = Card.objects.get(card_number=card_number)
+        try:
+            otp = OtpToken.objects.get(user=card, otp=otp)
+        except:
+            raise BadRequest("INVALID CREDENTIALS")
+        if datetime.now() > otp.expired_in.replace(tzinfo=None):
+            raise BadRequest("OTP EXPIRED")
+        otp.refresh()
+        return card
+
+    def to_representation(self, instance):
+        """Override instance output"""
+        data = {
+            "idencode": instance.idencode,
+            "name": instance.username if instance.username else instance.holder_name,
+            "type": instance.type,
+            "bearer": instance.issue_access_token(),
+        }
+        return data

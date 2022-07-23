@@ -1,9 +1,11 @@
 from django.utils import timezone
+from datetime import datetime, timedelta
 from django.db import models
 from django.db.models import IntegerField, CharField, \
     ForeignKey, BooleanField, DateTimeField
 from django.contrib.auth.models import AbstractUser
 from django.utils.crypto import get_random_string
+from random import randint
 
 from common.functions import encode
 from common.models import AbstractBaseModel
@@ -22,6 +24,13 @@ class User(AbstractUser):
     def issue_access_token(self):
         """Function to get or create user access token."""
         token, created = AccessToken.objects.get_or_create(user=self)
+        self.last_login = timezone.now()
+        self.save()
+        return token.key
+
+    def issue_otp_token(self):
+        """Function to get or create user access token."""
+        token, created = OtpToken.objects.get_or_create(user=self)
         self.last_login = timezone.now()
         self.save()
         return token.key
@@ -60,7 +69,7 @@ class RationShop(User):
 
 class Card(User):
     """To store card owner details"""
-    card_number = CharField(max_length=15, default='')
+    card_number = CharField(max_length=15, default='', unique=True)
     holder_name = CharField(max_length=100, default='')
     card_type = IntegerField(default=CardType.WHITE,
                              choices=CardType.choices())
@@ -114,10 +123,30 @@ class AccessToken(models.Model):
 class OtpToken(AbstractBaseModel):
     """To store OTP information"""
     user = ForeignKey(User, on_delete=models.CASCADE)
-    otp = IntegerField()
+    otp = IntegerField(null=True)
     is_active = BooleanField(default=False)
     type = IntegerField(default=None, choices=OTPType.choices())
+    expired_in = DateTimeField(default=datetime.now() + timedelta(minutes=10))
 
     def __str__(self):
-        return self.user.username + self.otp
+        return self.user.username + str(self.otp)
+
+    def save(self, *args, **kwargs):
+        """Overriding the save method to generate key."""
+        if not self.otp:
+            self.key = randint(100000, 999999)
+        self.expired_in = datetime.now() + timedelta(minutes=10)
+        return super(OtpToken, self).save(*args, **kwargs)
+
+    def generate_unique_key(self):
+        """Function to generate unique key."""
+        key = randint(100000, 999999)
+        if OtpToken.objects.filter(otp=key).exists():
+            self.generate_unique_key()
+        return key
+
+    def refresh(self):
+        """Function  to change token."""
+        self.otp = self.generate_unique_key()
+        self.save()
 
