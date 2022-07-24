@@ -8,8 +8,9 @@ from common.services import send_otp
 from rest_framework.views import APIView
 from rest_framework.response import Response
 # Create your views here.
-from supply.models import Product
-from supply.serializer import ProductSerializer
+from supply.filter import StockFilter
+from supply.models import Product, Stock
+from supply.serializer import ProductSerializer, StockSerializer
 
 
 class ProductView(ListCreateAPIView):
@@ -18,3 +19,13 @@ class ProductView(ListCreateAPIView):
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
 
+
+class StockView(ListCreateAPIView, MultiPermissionView):
+    """View for product list and create"""
+    permissions = {
+        'GET': (IsAuthenticated, ),
+        'POST': (IsAuthenticated, IsAdmin)
+    }
+    serializer_class = StockSerializer
+    queryset = Stock.objects.all()
+    filterset_class = StockFilter

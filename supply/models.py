@@ -18,7 +18,7 @@ class Product(AbstractBaseModel):
     unit = IntegerField(default=UnitType.KG, choices=UnitType.choices())
 
     def __str__(self):
-        return self.name + ' ' + self.unit
+        return self.name + ' ' + UnitType(value=self.unit).name
 
 
 class Stock(AbstractBaseModel):
@@ -26,6 +26,9 @@ class Stock(AbstractBaseModel):
     product = ForeignKey(Product, on_delete=models.CASCADE)
     shop = ForeignKey(RationShop, on_delete=models.CASCADE)
     quantity = IntegerField()
+
+    def __str__(self):
+        return f"{self.product.name} {self.shop.location} {self.quantity}"
 
 
 class Token(AbstractBaseModel):
