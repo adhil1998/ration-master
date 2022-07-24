@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models import IntegerField, CharField, \
-    ForeignKey, BooleanField, DateTimeField, TextField
+    ForeignKey, BooleanField, DateTimeField, TextField, DateField
 
 from common.functions import encode
 from common.models import AbstractBaseModel
@@ -54,6 +54,19 @@ class MonthlyQuota(AbstractBaseModel):
     quantity = IntegerField()
     card_type = IntegerField(default=CardType, choices=CardType.choices())
     age_group = IntegerField(default=None, choices=AgeGroupType.choices())
+    date = DateField(auto_now_add=True)
+    current_year = IntegerField(default=0)
+    current_month = IntegerField(default=0)
+
+    class Meta:
+        unique_together = ['product', 'quantity', 'card_type', 'age_group',
+                           'current_year', 'current_month']
+
+    def save(self, *args, **kwargs):
+        """"""
+        self.current_month = self.date.month
+        self.current_year = self.date.year
+        super(MonthlyQuota, self).save(*args, **kwargs)
 
 
 class Holidays(AbstractBaseModel):

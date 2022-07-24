@@ -14,12 +14,12 @@ class ProductFilter(filters.FilterSet):
 class StockFilter(filters.FilterSet):
     """"""
     shop = filters.CharFilter(method="shop_filter")
-    product = filters.CharFilter(method="product")
+    product = filters.CharFilter(method="product_filter")
 
     def shop_filter(self, queryset, name, value):
         """"""
-        return queryset.filter(shop__idencode=decode('value'))
+        return queryset.filter(shop__id=decode(value))
 
     def product_filter(self, queryset, name, value):
         """"""
-        return queryset.filter(product__idencode=decode('value'))
+        return queryset.filter(product__id=decode(value))

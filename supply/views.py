@@ -9,8 +9,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 # Create your views here.
 from supply.filter import StockFilter
-from supply.models import Product, Stock
-from supply.serializer import ProductSerializer, StockSerializer
+from supply.models import Product, Stock, MonthlyQuota
+from supply.serializer import ProductSerializer, StockSerializer, MonthlyQuotaSerializer
 
 
 class ProductView(ListCreateAPIView):
@@ -29,3 +29,13 @@ class StockView(ListCreateAPIView, MultiPermissionView):
     serializer_class = StockSerializer
     queryset = Stock.objects.all()
     filterset_class = StockFilter
+
+
+class MonthlyQuotaView(ListCreateAPIView, UpdateAPIView):
+    """"""
+    permissions = {
+        'GET': (IsAuthenticated,),
+        'POST': (IsAuthenticated, IsAdmin)
+    }
+    serializer_class = MonthlyQuotaSerializer
+    queryset = MonthlyQuota.objects.all()
