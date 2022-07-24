@@ -50,7 +50,7 @@ class Purchase(AbstractBaseModel):
 
 class MonthlyQuota(AbstractBaseModel):
     """To store product quantity availabale for each card owner"""
-    product = ForeignKey(Product, on_delete=models.CASCADE)
+    product = ForeignKey(Product, on_delete=models.CASCADE, related_name='quota')
     quantity = IntegerField()
     card_type = IntegerField(default=CardType, choices=CardType.choices())
     age_group = IntegerField(default=None, choices=AgeGroupType.choices())
@@ -59,7 +59,7 @@ class MonthlyQuota(AbstractBaseModel):
     current_month = IntegerField(default=0)
 
     class Meta:
-        unique_together = ['product', 'quantity', 'card_type', 'age_group',
+        unique_together = ['product', 'card_type', 'age_group',
                            'current_year', 'current_month']
 
     def save(self, *args, **kwargs):

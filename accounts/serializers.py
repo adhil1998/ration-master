@@ -2,13 +2,14 @@ from datetime import datetime
 
 from rest_framework import serializers
 from rest_framework.serializers import CharField, IntegerField, SerializerMethodField
-from django.db.models import Sum, F
+from django.db.models import Sum, F, Count, Q, Case, When
 from django.contrib.auth import authenticate
 
-from accounts.constants import UserType
+from accounts.constants import UserType, AgeGroupType
 from accounts.models import User, Admin, RationShop, Card, OtpToken, Member
 from common.exceptions import UnauthorizedAccess, BadRequest
 from common.fields import KWArgsObjectField
+from supply.models import Product, MonthlyQuota
 
 
 class AdminSerializer(serializers.ModelSerializer):
@@ -59,17 +60,67 @@ class ShopSerializer(serializers.ModelSerializer):
         return user
 
 
+class MemberSerializer(serializers.ModelSerializer):
+    """Serializer for contacts"""
+    card = KWArgsObjectField(write_only=True)
+
+    class Meta:
+        model = Member
+        fields = ['name', 'age', 'age_group', 'idencode',
+                  'gender', 'card', 'occupation']
+
+    def create(self, validated_data):
+        """Override create"""
+        contact = super(MemberSerializer, self).create(validated_data)
+        return contact
+
+
 class CardSerializer(serializers.ModelSerializer):
     """Serializer for lis and create User(s)"""
     holder_name = CharField(required=True)
     card_number = IntegerField(required=True)
     card_type = IntegerField(required=True)
+    available_quota = SerializerMethodField()
+    members = MemberSerializer(many=True, read_only=True)
 
     class Meta:
         """meta info"""
         model = Card
         fields = ['idencode', 'email', 'mobile', 'card_number', 'holder_name',
-                  'card_type', 'verified']
+                  'card_type', 'verified', 'available_quota', 'members']
+
+    def get_available_quota(self, obj):
+        """get availble amound of prodects per card in month"""
+        query = Q(
+            quota__current_month=datetime.now().month,
+            quota__current_year=datetime.now().year,
+            quota__card_type=obj.card_type)
+        products = Product.objects.annotate(ration=Count('quota', filter=query)).exclude(ration=0)
+        child = obj.members.filter(age_group=AgeGroupType.CHILD).count()
+        adults = obj.members.filter(age_group=AgeGroupType.ADULT).count()
+        for product in products:
+            try:
+                adults_quantity = MonthlyQuota.objects.get(
+                    current_month=datetime.now().month, current_year=datetime.now().year,
+                    card_type=obj.card_type, product=product,
+                    age_group=AgeGroupType.ADULT).quantity * adults
+            except:
+                adults_quantity = 0
+            try:
+                child_quantity = MonthlyQuota.objects.get(
+                    current_month=datetime.now().month, current_year=datetime.now().year,
+                    card_type=obj.card_type, product=product,
+                    age_group=AgeGroupType.CHILD).quantity * child
+            except:
+                child_quantity = 0
+            product_list = []
+            data = {
+                "idencode": product.idencode,
+                "name": product.name,
+                "quantity": adults_quantity + child_quantity
+            }
+            product_list.append(data)
+        return product_list
 
     def create(self, validated_data):
         """Override user creation"""
@@ -136,17 +187,3 @@ class LoginOTPSerializer(serializers.Serializer):
         }
         return data
 
-
-class MemberSerializer(serializers.ModelSerializer):
-    """Serializer for contacts"""
-    card = KWArgsObjectField(write_only=True)
-
-    class Meta:
-        model = Member
-        fields = ['name', 'age', 'age_group', 'idencode',
-                  'gender', 'card', 'occupation']
-
-    def create(self, validated_data):
-        """Override create"""
-        contact = super(MemberSerializer, self).create(validated_data)
-        return contact

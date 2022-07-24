@@ -5,7 +5,9 @@ from accounts.views import AdminCreateView, ShopCreateView, CardCreateView, \
 urlpatterns = [
     path(r'signup/admin/', AdminCreateView .as_view()),
     path(r'signup/shop/', ShopCreateView .as_view()),
+    path(r'get/shop/<idencode:pk>/', ShopCreateView .as_view()),
     path(r'signup/card/', CardCreateView .as_view()),
+    path(r'get/card/<idencode:pk>/', CardCreateView.as_view()),
     path(r'login/', LoginView .as_view()),
     path(r'login/create/otp/', CreateOtp .as_view()),
     path(r'login/otp/', LoginOTPView .as_view()),

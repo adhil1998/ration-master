@@ -84,7 +84,7 @@ class Card(User):
 
 class Member(AbstractBaseModel):
     """To store member detail"""
-    card = ForeignKey(Card, on_delete=models.CASCADE)
+    card = ForeignKey(Card, on_delete=models.CASCADE, related_name='members')
     name = CharField(max_length=100, default='')
     age = IntegerField(default=None)
     age_group = IntegerField(default=None, choices=AgeGroupType.choices())
