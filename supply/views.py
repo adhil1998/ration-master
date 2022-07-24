@@ -9,8 +9,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 # Create your views here.
 from supply.filter import StockFilter
-from supply.models import Product, Stock, MonthlyQuota
-from supply.serializer import ProductSerializer, StockSerializer, MonthlyQuotaSerializer
+from supply.models import Product, Stock, MonthlyQuota, Holidays, PublicHolidays
+from supply.serializer import ProductSerializer, StockSerializer, MonthlyQuotaSerializer, HolidaysSerializer, \
+    PublicHolidaysSerializer
 
 
 class ProductView(ListCreateAPIView):
@@ -39,3 +40,23 @@ class MonthlyQuotaView(ListCreateAPIView, UpdateAPIView):
     }
     serializer_class = MonthlyQuotaSerializer
     queryset = MonthlyQuota.objects.all()
+
+
+class HolidaysView(ListCreateAPIView):
+    """"""
+    permissions = {
+        'GET': (IsAuthenticated,),
+        'POST': (IsAuthenticated, IsAdmin or IsShop)
+    }
+    serializer_class = HolidaysSerializer
+    queryset = Holidays.objects.all()
+
+
+class PublicHolidaysView(ListCreateAPIView):
+    """"""
+    permissions = {
+        'GET': (IsAuthenticated,),
+        'POST': (IsAuthenticated, IsAdmin)
+    }
+    serializer_class = PublicHolidaysSerializer
+    queryset = PublicHolidays.objects.all()

@@ -72,7 +72,24 @@ class MonthlyQuota(AbstractBaseModel):
 class Holidays(AbstractBaseModel):
     """To store holy days"""
     shop = ForeignKey(RationShop, on_delete=models.CASCADE)
-    holidays = TextField()
+    holidays = TextField(default="[]")
+    date = DateField(auto_now_add=True)
+    current_year = IntegerField(default=0)
+    current_month = IntegerField(default=0)
+
+    class Meta:
+        unique_together = ['shop', 'current_year', 'current_month']
+
+
+class PublicHolidays(AbstractBaseModel):
+    """To store holy days"""
+    holidays = TextField(default="[]")
+    date = DateField(auto_now_add=True)
+    current_year = IntegerField(default=0)
+    current_month = IntegerField(default=0)
+
+    class Meta:
+        unique_together = ['current_year', 'current_month']
 
 
 
