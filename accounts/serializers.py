@@ -9,7 +9,8 @@ from accounts.constants import UserType, AgeGroupType
 from accounts.models import User, Admin, RationShop, Card, OtpToken, Member
 from common.exceptions import UnauthorizedAccess, BadRequest
 from common.fields import KWArgsObjectField
-from supply.models import Product, MonthlyQuota
+from supply.constants import TokenStatus
+from supply.models import Product, MonthlyQuota, Stock, Purchase
 
 
 class AdminSerializer(serializers.ModelSerializer):
@@ -39,16 +40,46 @@ class ShopSerializer(serializers.ModelSerializer):
     employee_name = CharField(required=True)
     employee_id = IntegerField(required=True)
     location = CharField(required=True)
+    stock = SerializerMethodField()
+    current_stock = SerializerMethodField()
 
     class Meta:
         """meta info"""
         model = RationShop
         fields = ['username', 'idencode', 'email', 'mobile', 'password',
                   'first_name', 'last_name', 'employee_name', 'employee_id',
-                  'location', 'verified']
+                  'location', 'verified', 'stock', 'current_stock']
         extra_kwargs = {
             'password': {'write_only': True}
         }
+
+    def get_stock(self, obj):
+        """Get stock details of shop"""
+        stocks = Stock.objects.filter(shop=obj).exclude(quantity=0)
+        stock_list = []
+        for stock in stocks:
+            data = {
+                "name": stock.product.name,
+                "quantity": stock.quantity,
+                "unit": stock.product.unit
+            }
+            stock_list.append(data)
+        return stock_list
+
+    def get_current_stock(self, obj):
+        """Get current stock details ( After exclude quantity booked by token )"""
+        stocks = Stock.objects.filter(shop=obj).exclude(quantity=0)
+        stock_list = []
+        for stock in stocks:
+            purchased_quantity = Purchase.objects.filter(
+                token__status=TokenStatus.INITIATED).aggregate(Sum('quantity', default=0))['quantity__sum']
+            data = {
+                "name": stock.product.name,
+                "quantity": stock.quantity - purchased_quantity,
+                "unit": stock.product.unit
+            }
+            stock_list.append(data)
+        return stock_list
 
     def create(self, validated_data):
         """Override user creation"""
@@ -117,7 +148,8 @@ class CardSerializer(serializers.ModelSerializer):
             data = {
                 "idencode": product.idencode,
                 "name": product.name,
-                "quantity": adults_quantity + child_quantity
+                "quantity": adults_quantity + child_quantity,
+                "unit": product.unit
             }
             product_list.append(data)
         return product_list
@@ -186,4 +218,3 @@ class LoginOTPSerializer(serializers.Serializer):
             "bearer": instance.issue_access_token(),
         }
         return data
-

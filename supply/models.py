@@ -23,8 +23,8 @@ class Product(AbstractBaseModel):
 
 class Stock(AbstractBaseModel):
     """To store information about product stock"""
-    product = ForeignKey(Product, on_delete=models.CASCADE)
-    shop = ForeignKey(RationShop, on_delete=models.CASCADE)
+    product = ForeignKey(Product, on_delete=models.CASCADE, related_name='stock')
+    shop = ForeignKey(RationShop, on_delete=models.CASCADE, related_name='stock')
     quantity = IntegerField()
 
     def __str__(self):
