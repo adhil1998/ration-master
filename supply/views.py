@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.generics import ListAPIView, ListCreateAPIView, \
-    CreateAPIView, RetrieveAPIView, UpdateAPIView
+    RetrieveAPIView, UpdateAPIView
 
 from common.permissions import IsAuthenticated, IsAdmin, MultiPermissionView, IsShop, IsCard
 from common.functions import success_response, decode
@@ -9,9 +9,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 # Create your views here.
 from supply.filter import StockFilter
-from supply.models import Product, Stock, MonthlyQuota, Holidays, PublicHolidays
+from supply.models import Product, Stock, MonthlyQuota, Holidays, PublicHolidays, Token
 from supply.serializer import ProductSerializer, StockSerializer, MonthlyQuotaSerializer, HolidaysSerializer, \
-    PublicHolidaysSerializer
+    PublicHolidaysSerializer, TokenSerializer
 
 
 class ProductView(ListCreateAPIView):
@@ -42,7 +42,7 @@ class MonthlyQuotaView(ListCreateAPIView, UpdateAPIView):
     queryset = MonthlyQuota.objects.all()
 
 
-class HolidaysView(ListCreateAPIView):
+class HolidaysView(ListCreateAPIView, MultiPermissionView):
     """"""
     permissions = {
         'GET': (IsAuthenticated,),
@@ -52,7 +52,7 @@ class HolidaysView(ListCreateAPIView):
     queryset = Holidays.objects.all()
 
 
-class PublicHolidaysView(ListCreateAPIView):
+class PublicHolidaysView(ListCreateAPIView, MultiPermissionView):
     """"""
     permissions = {
         'GET': (IsAuthenticated,),
@@ -60,3 +60,14 @@ class PublicHolidaysView(ListCreateAPIView):
     }
     serializer_class = PublicHolidaysSerializer
     queryset = PublicHolidays.objects.all()
+
+
+class TokenView(ListCreateAPIView, RetrieveAPIView, MultiPermissionView):
+    """"""
+    permissions = {
+        'GET': (IsAuthenticated,),
+        'POST': (IsAuthenticated, IsCard)
+    }
+    serializer_class = TokenSerializer
+    queryset = Token.objects.all()
+

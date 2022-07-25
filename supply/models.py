@@ -33,10 +33,12 @@ class Stock(AbstractBaseModel):
 
 class Token(AbstractBaseModel):
     """To store Token data"""
-    card = ForeignKey(Card, on_delete=models.CASCADE)
-    RationShop = ForeignKey(RationShop, on_delete=models.CASCADE)
-    number = IntegerField()
-    time = DateTimeField(default=None)
+    card = ForeignKey(Card, on_delete=models.CASCADE, related_name='toke',
+                      null=True, blank=True)
+    shop = ForeignKey(RationShop, on_delete=models.CASCADE, related_name='toke',
+                      null=True, blank=True)
+    number = IntegerField(null=True, blank=True)
+    time = DateTimeField(default=None, null=True, blank=True)
     status = IntegerField(default=TokenStatus.INITIATED,
                           choices=TokenStatus.choices())
 

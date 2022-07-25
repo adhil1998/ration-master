@@ -72,7 +72,8 @@ class ShopSerializer(serializers.ModelSerializer):
         stock_list = []
         for stock in stocks:
             purchased_quantity = Purchase.objects.filter(
-                token__status=TokenStatus.INITIATED).aggregate(Sum('quantity', default=0))['quantity__sum']
+                token__status=TokenStatus.INITIATED).aggregate(Sum(
+                'quantity', default=0))['quantity__sum']
             data = {
                 "name": stock.product.name,
                 "quantity": stock.quantity - purchased_quantity,

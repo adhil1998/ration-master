@@ -11,3 +11,6 @@ class TokenStatus(ChoiceAdapter):
     INITIATED = 100
     COMPLETED = 200
     CANCELED = 300
+
+
+MAX_TOKEN = 102

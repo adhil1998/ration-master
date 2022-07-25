@@ -3,15 +3,18 @@ from itertools import product
 
 from rest_framework import serializers
 from rest_framework.serializers import CharField, IntegerField, SerializerMethodField, \
-    DateField, PrimaryKeyRelatedField
+    DateField, PrimaryKeyRelatedField, DateTimeField
 from django.db.models import Sum, F
 
 from accounts.constants import AgeGroupType
-from accounts.models import RationShop
-from accounts.serializers import ShopSerializer
+from accounts.models import RationShop, Card
+from accounts.serializers import ShopSerializer, CardSerializer
 from common.exceptions import BadRequest
-from common.fields import IdencodeField
-from supply.models import Product, Stock, MonthlyQuota, Holidays, PublicHolidays
+from common.fields import IdencodeField, KWArgsObjectField
+from supply.constants import TokenStatus
+from supply.models import Product, Stock, MonthlyQuota, Holidays, PublicHolidays, \
+    Token
+from supply.utilities import create_token_time
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -95,3 +98,39 @@ class PublicHolidaysSerializer(serializers.ModelSerializer):
         except Exception as e:
             raise BadRequest("update" + str(e))
         return holiday
+
+
+class TokenSerializer(serializers.ModelSerializer):
+    """"""
+    shop = IdencodeField(related_model=RationShop, serializer=ShopSerializer)
+    card = KWArgsObjectField(serializer=CardSerializer)
+
+    class Meta:
+        model = Token
+        fields = ['card', 'shop', 'number', 'time', 'status']
+        extra_kwargs = {
+            'time': {'read_only': True},
+            'number': {'read_only': True}
+        }
+
+    def create(self, validated_data):
+        """"""
+        validated_data['time'], validated_data['number'] = create_token_time(validated_data['shop'])
+        validated_data['status'] = TokenStatus.INITIATED
+        token = Token.objects.filter(
+            card=validated_data['card'],
+            time__year=validated_data['time'].year,
+            time__month=validated_data['time'].month,
+            status__in=[TokenStatus.COMPLETED, TokenStatus.INITIATED]).exists()
+        if token:
+            raise BadRequest('Token already created')
+        token = Token.objects.create(**validated_data)
+        return token
+
+    def to_representation(self, instance):
+        data = {"shop": ShopSerializer(instance.shop).data,
+                "time": datetime.strftime(instance.time, "%H:%M %d-%m-%y"),
+                "card": CardSerializer(instance.card).data,
+                "number": instance.number,
+                "status": instance.status}
+        return data
