@@ -45,9 +45,12 @@ class Token(AbstractBaseModel):
 
 class Purchase(AbstractBaseModel):
     """To store purchase details"""
-    token = ForeignKey(Token, on_delete=models.CASCADE)
-    product = ForeignKey(Product, on_delete=models.CASCADE)
+    token = ForeignKey(Token, on_delete=models.CASCADE, related_name='purchase')
+    product = ForeignKey(Product, on_delete=models.CASCADE, related_name='purchase')
     quantity = IntegerField()
+
+    class Meta:
+        unique_together = ['token', 'product']
 
 
 class MonthlyQuota(AbstractBaseModel):

@@ -13,7 +13,7 @@ from common.exceptions import BadRequest
 from common.fields import IdencodeField, KWArgsObjectField
 from supply.constants import TokenStatus
 from supply.models import Product, Stock, MonthlyQuota, Holidays, PublicHolidays, \
-    Token
+    Token, Purchase
 from supply.utilities import create_token_time
 
 
@@ -100,6 +100,22 @@ class PublicHolidaysSerializer(serializers.ModelSerializer):
         return holiday
 
 
+class PurchaseSerializer(serializers.ModelSerializer):
+    """serializer for purchase"""
+    token = IdencodeField(related_model=Token, write_only=True)
+    product = IdencodeField(related_model=Product, serializer=ProductSerializer)
+
+    class Meta:
+        model = Purchase
+        fields = ['token', 'product', 'quantity']
+
+    def validate(self, data):
+        """"""
+        if not data['token'].status == TokenStatus.INITIATED:
+            raise BadRequest("NOT VALID TOKEN")
+        return data
+
+
 class TokenSerializer(serializers.ModelSerializer):
     """"""
     shop = IdencodeField(related_model=RationShop, serializer=ShopSerializer)
@@ -128,9 +144,11 @@ class TokenSerializer(serializers.ModelSerializer):
         return token
 
     def to_representation(self, instance):
-        data = {"shop": ShopSerializer(instance.shop).data,
+        data = {"idencode": instance.idencode,
+                "shop": ShopSerializer(instance.shop).data,
                 "time": datetime.strftime(instance.time, "%H:%M %d-%m-%y"),
                 "card": CardSerializer(instance.card).data,
                 "number": instance.number,
-                "status": instance.status}
+                "status": instance.status,
+                "purchase": PurchaseSerializer(instance.purchase.all(), many=True).data}
         return data
