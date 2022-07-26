@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 # Create your views here.
 from supply.constants import TokenStatus
-from supply.filter import StockFilter
+from supply.filter import StockFilter, TokenFilter
 from supply.models import Product, Stock, MonthlyQuota, Holidays, PublicHolidays, Token, Purchase
 from supply.serializer import ProductSerializer, StockSerializer, MonthlyQuotaSerializer, HolidaysSerializer, \
     PublicHolidaysSerializer, TokenSerializer, PurchaseSerializer
@@ -70,12 +70,13 @@ class TokenView(ListCreateAPIView, RetrieveAPIView, UpdateAPIView,
     permissions = {
         'GET': (IsAuthenticated,),
         'POST': (IsAuthenticated, IsCard),
-        'PATCH': (IsAuthenticated, )
+        'PATCH': (IsAuthenticated, IsShop)
     }
     serializer_class = TokenSerializer
     queryset = Token.objects.all().order_by('number')
+    filterset_class = TokenFilter
 
-    def patch(self, request, pk, user=None):
+    def patch(self, request, pk, **kwargs):
         """Override update method"""
         instance = self.get_object()
         validated_data = self.request.data
