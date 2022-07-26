@@ -66,7 +66,7 @@ class CreateOtp(APIView):
                 user=card, type=OTPType.LOGIN)
             otp.refresh()
             body = f"OTP to login into ration master {otp.otp}. valid for 10 mints"
-            # send_otp(card.mobile, body)
+            send_otp(card.mobile, body)
         except Exception as e:
             raise BadRequest('INVALID CARD NUMBER' + str(e))
         data = {"otp": otp.otp}
@@ -91,7 +91,7 @@ class VerifyShopView(UpdateAPIView, DestroyAPIView):
         """Override delete"""
         try:
             shop = RationShop.objects.get(id=kwargs['pk'])
-            # send_otp(shop.mobile, f'Dear {shop.username},Your shop permission rejected..Enjoyyyyy:)')
+            send_otp(shop.mobile, f'Dear {shop.username},Your shop permission rejected..Enjoyyyyy:)')
             shop.delete()
         except:
             raise BadRequest('Card not found')
@@ -116,7 +116,7 @@ class VerifyCardView(UpdateAPIView, DestroyAPIView):
         """Override delete"""
         try:
             card = Card.objects.get(id=kwargs['pk'])
-            # send_otp(card.mobile, f'Dear {card.holder_name}, Your Ration card rejected.....Enjoyyyyy::))))')
+            send_otp(card.mobile, f'Dear {card.holder_name}, Your Ration card rejected.....Enjoyyyyy::))))')
             card.delete()
         except:
             raise BadRequest('Card not found')
