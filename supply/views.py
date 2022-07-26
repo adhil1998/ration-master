@@ -34,6 +34,22 @@ class StockView(ListCreateAPIView, MultiPermissionView):
     filterset_class = StockFilter
 
 
+class StockUpdateView(UpdateAPIView, MultiPermissionView):
+    """View for product list and create"""
+    permissions = {
+        'PATCH': (IsAuthenticated, IsAdmin)
+    }
+    serializer_class = StockSerializer
+    queryset = Stock.objects.all()
+
+    def patch(self, request, *args, **kwargs):
+        """"""
+        stock = Stock.objects.get(id=kwargs['pk'])
+        stock.quantity = self.request.data['quantity']
+        stock.save()
+        return success_response(StockSerializer(stock).data)
+
+
 class MonthlyQuotaView(ListCreateAPIView, UpdateAPIView):
     """"""
     permissions = {
