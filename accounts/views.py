@@ -20,7 +20,7 @@ class AdminCreateView(CreateAPIView, RetrieveAPIView):
     queryset = Admin.objects.all()
 
 
-class ShopCreateView(ListCreateAPIView, RetrieveAPIView, MultiPermissionView):
+class ShopCreateView(ListCreateAPIView, MultiPermissionView):
     """Serializer for lis and create User(s)"""
     permissions = {
         'GET': (
@@ -32,12 +32,32 @@ class ShopCreateView(ListCreateAPIView, RetrieveAPIView, MultiPermissionView):
     filterset_class = ShopFilter
 
 
-class CardCreateView(ListCreateAPIView, RetrieveAPIView, MultiPermissionView):
+class ShopDetailView(RetrieveAPIView,):
+    """Serializer for lis and create User(s)"""
+    permissions = {
+        'GET': (
+            IsAuthenticated),
+    }
+    serializer_class = ShopSerializer
+    queryset = RationShop.objects.all()
+
+
+class CardCreateView(ListCreateAPIView, MultiPermissionView):
     """Serializer for lis and create User(s)"""
     permissions = {
         'GET': (
             IsAuthenticated, IsAdmin or IsShop),
         'POST': ()
+    }
+    serializer_class = CardSerializer
+    queryset = Card.objects.all()
+
+
+class CardDetailView(RetrieveAPIView,):
+    """Serializer for lis and create User(s)"""
+    permissions = {
+        'GET': (
+            IsAuthenticated),
     }
     serializer_class = CardSerializer
     queryset = Card.objects.all()
