@@ -157,6 +157,7 @@ class CardSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Override user creation"""
+        validated_data['username'] = validated_data['card_number']
         user = super(CardSerializer, self).create(validated_data)
         user.type = UserType.CARD
         user.save()
