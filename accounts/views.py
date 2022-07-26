@@ -1,12 +1,13 @@
 from rest_framework.generics import ListAPIView, ListCreateAPIView, \
-    CreateAPIView, RetrieveAPIView, UpdateAPIView
+    CreateAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
 
 from accounts.constants import OTPType
 from accounts.filter import CardFilter, ShopFilter
 from accounts.serializers import *
 from accounts.models import Admin, RationShop, OtpToken
 from common.exceptions import BadRequest
-from common.permissions import IsAuthenticated, IsAdmin, MultiPermissionView, IsShop, IsCard
+from common.permissions import IsAuthenticated, IsAdmin, \
+    MultiPermissionView, IsShop, IsCard
 from common.functions import success_response, decode
 from common.services import send_otp
 from rest_framework.views import APIView
@@ -72,7 +73,7 @@ class CreateOtp(APIView):
         return Response(data)
 
 
-class VerifyShopView(APIView):
+class VerifyShopView(UpdateAPIView, DestroyAPIView):
     """to verify shops"""
     permission_classes = (IsAuthenticated, IsAdmin)
 
@@ -86,20 +87,40 @@ class VerifyShopView(APIView):
         except:
             raise BadRequest("INVALID ID")
 
+    def destroy(self, request, *args, **kwargs):
+        """Override delete"""
+        try:
+            shop = RationShop.objects.get(id=kwargs['pk'])
+            # send_otp(shop.mobile, f'Dear {shop.username},Your shop permission rejected..Enjoyyyyy:)')
+            shop.delete()
+        except:
+            raise BadRequest('Card not found')
+        return success_response('deleted')
 
-class VerifyCardView(UpdateAPIView):
+
+class VerifyCardView(UpdateAPIView, DestroyAPIView):
     """to verify shops"""
     permission_classes = (IsAuthenticated, IsAdmin)
 
-    def get(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
         """Override get method"""
         try:
-            shop = Card.objects.get(id=kwargs['pk'])
-            shop.verified = True
-            shop.save()
+            card = Card.objects.get(id=kwargs['pk'])
+            card.verified = True
+            card.save()
             return success_response('shop is verified now')
         except:
             raise BadRequest("INVALID ID")
+
+    def destroy(self, request, *args, **kwargs):
+        """Override delete"""
+        try:
+            card = Card.objects.get(id=kwargs['pk'])
+            # send_otp(card.mobile, f'Dear {card.holder_name}, Your Ration card rejected.....Enjoyyyyy::))))')
+            card.delete()
+        except:
+            raise BadRequest('Card not found')
+        return success_response('deleted')
 
 
 class MemberListCreate(ListCreateAPIView, MultiPermissionView):

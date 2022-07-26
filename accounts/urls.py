@@ -12,7 +12,9 @@ urlpatterns = [
     path(r'login/create/otp/', CreateOtp .as_view()),
     path(r'login/otp/', LoginOTPView .as_view()),
     path(r'verify/card/<idencode:pk>/', VerifyCardView .as_view()),
+    path(r'delete/card/<idencode:pk>/', VerifyCardView .as_view()),
     path(r'verify/shop/<idencode:pk>/', VerifyShopView .as_view()),
+    path(r'delete/shop/<idencode:pk>/', VerifyShopView .as_view()),
     path(r'member/', MemberListCreate.as_view()),
 
 ]
