@@ -105,7 +105,6 @@ class VerifyShopView(UpdateAPIView, DestroyAPIView):
             shop.save()
             send_otp(shop.mobile, f'Dear {shop.holder_name}, '
                                   f'Your Ration shop verified.....Enjoyyyyy::))))')
-            shop.delete()
             return success_response('shop is verified now')
         except:
             raise BadRequest("INVALID ID")
@@ -132,7 +131,6 @@ class VerifyCardView(UpdateAPIView, DestroyAPIView):
             card.verified = True
             card.save()
             send_otp(card.mobile, f'Dear {card.holder_name}, Your Ration card verified.....Enjoyyyyy::))))')
-            card.delete()
             return success_response('shop is verified now')
         except:
             raise BadRequest("INVALID ID")

@@ -10,6 +10,7 @@ from accounts.models import RationShop, Card
 from accounts.serializers import ShopSerializer, CardSerializer
 from common.exceptions import BadRequest
 from common.fields import IdencodeField, KWArgsObjectField
+from common.services import send_otp
 from supply.constants import TokenStatus
 from supply.models import Product, Stock, MonthlyQuota, Holidays, PublicHolidays, \
     Token, Purchase
@@ -140,6 +141,9 @@ class TokenSerializer(serializers.ModelSerializer):
         if token:
             raise BadRequest('Token already created')
         token = Token.objects.create(**validated_data)
+        send_otp(token.card.mobile, f'Your token for VQ Ration successfully booked. '
+                                    f'Number:{token.number}\n'
+                                    f'Time&Date:{token.time.strftime("%H:%M %d-%m-%y")}')
         return token
 
     def to_representation(self, instance):
