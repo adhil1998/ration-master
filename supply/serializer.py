@@ -1,5 +1,4 @@
 from datetime import datetime
-from itertools import product
 
 from rest_framework import serializers
 from rest_framework.serializers import CharField, IntegerField, SerializerMethodField, \

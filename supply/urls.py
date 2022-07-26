@@ -13,5 +13,7 @@ urlpatterns = [
     path(r'public/holiday/', PublicHolidaysView .as_view()),
     path(r'token/create/', TokenView .as_view()),
     path(r'token/', TokenView .as_view()),
+    path(r'token/active/', TokenView.as_view()),
+    path(r'token/update/<idencode:pk>/', TokenView.as_view()),
     path(r'purchase/', PurchaseView.as_view()),
 ]
