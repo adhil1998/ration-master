@@ -130,6 +130,7 @@ class CardSerializer(serializers.ModelSerializer):
         products = Product.objects.annotate(ration=Count('quota', filter=query)).exclude(ration=0)
         child = obj.members.filter(age_group=AgeGroupType.CHILD).count()
         adults = obj.members.filter(age_group=AgeGroupType.ADULT).count()
+        product_list = []
         for product in products:
             try:
                 adults_quantity = MonthlyQuota.objects.get(
@@ -145,7 +146,6 @@ class CardSerializer(serializers.ModelSerializer):
                     age_group=AgeGroupType.CHILD).quantity * child
             except:
                 child_quantity = 0
-            product_list = []
             data = {
                 "idencode": product.idencode,
                 "name": product.name,
