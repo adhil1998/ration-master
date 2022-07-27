@@ -125,7 +125,7 @@ WSGI_APPLICATION = 'ration_master.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgres://lpfgntesvvqqow:adc9ccf0369bd0921bdcc3f60a0edfdfa2d8fda9dd983ca3083cc060de522aac@ec2-34-235-198-25.compute-1.amazonaws.com:5432/d3ijbnjj22j992')
+        default=os.environ['DATABASE_URL'])
 }
 
 
