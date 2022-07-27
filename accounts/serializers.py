@@ -227,7 +227,7 @@ class ShopLiteSerializer(serializers.ModelSerializer):
     class Meta:
         """meta info"""
         model = RationShop
-        fields = ['username', 'idencode', 'verified']
+        fields = ['first_name', 'idencode', ]
         extra_kwargs = {
             'password': {'write_only': True}
         }
