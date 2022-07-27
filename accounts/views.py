@@ -168,3 +168,11 @@ class MemberListCreate(ListCreateAPIView, MultiPermissionView):
             return queryset
         except:
             raise BadRequest('INVALID DATA')
+
+
+class ShopListView(ListAPIView):
+    """Serializer for lis and create User(s)"""
+    permission_classes = (IsAuthenticated, )
+    serializer_class = ShopLiteSerializer
+    queryset = RationShop.objects.all()
+    filterset_class = ShopFilter

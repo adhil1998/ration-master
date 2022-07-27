@@ -82,7 +82,7 @@ class HolidaysSerializer(serializers.ModelSerializer):
 
 class PublicHolidaysSerializer(serializers.ModelSerializer):
     """"""
-
+    date = DateField()
     class Meta:
         model = PublicHolidays
         fields = ['holidays', 'date']
@@ -90,7 +90,7 @@ class PublicHolidaysSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """Override create"""
         try:
-            holiday, create = Holidays.objects.get_or_create(
+            holiday, create = PublicHolidays.objects.get_or_create(
                 current_year=validated_data['date'].year,
                 current_month=validated_data['date'].month)
             holiday.holidays = validated_data['holidays']

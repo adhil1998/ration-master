@@ -1,10 +1,12 @@
 from django.urls import path
 from accounts.views import AdminCreateView, ShopCreateView, CardCreateView, \
-    LoginView, CreateOtp, LoginOTPView, VerifyCardView, VerifyShopView, MemberListCreate, CardDetailView, ShopDetailView
+    LoginView, CreateOtp, LoginOTPView, VerifyCardView, VerifyShopView, MemberListCreate, CardDetailView, \
+    ShopDetailView, ShopListView
 
 urlpatterns = [
     path(r'signup/admin/', AdminCreateView .as_view()),
     path(r'signup/shop/', ShopCreateView .as_view()),
+    path(r'list/shop/', ShopListView.as_view()),
     path(r'get/shop/<idencode:pk>/', ShopDetailView .as_view()),
     path(r'signup/card/', CardCreateView .as_view()),
     path(r'get/card/<idencode:pk>/', CardDetailView.as_view()),

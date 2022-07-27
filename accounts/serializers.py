@@ -220,3 +220,15 @@ class LoginOTPSerializer(serializers.Serializer):
             "bearer": instance.issue_access_token(),
         }
         return data
+
+
+class ShopLiteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        """meta info"""
+        model = RationShop
+        fields = ['username', 'idencode', 'verified']
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+
