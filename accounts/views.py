@@ -40,6 +40,7 @@ class ShopDetailView(RetrieveAPIView,):
     }
     serializer_class = ShopSerializer
     queryset = RationShop.objects.all()
+    filterset_class = ShopFilter
 
 
 class CardCreateView(ListCreateAPIView, MultiPermissionView):
@@ -51,6 +52,7 @@ class CardCreateView(ListCreateAPIView, MultiPermissionView):
     }
     serializer_class = CardSerializer
     queryset = Card.objects.all()
+    filterset_class = CardFilter
 
 
 class CardDetailView(RetrieveAPIView,):
