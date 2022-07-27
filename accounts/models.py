@@ -19,7 +19,6 @@ class User(AbstractUser):
     """User model"""
     type = IntegerField(default=UserType.CARD,
                         choices=UserType.choices())
-    mobile = CharField(max_length=15, default='', unique=True)
 
     def issue_access_token(self):
         """Function to get or create user access token."""
@@ -48,6 +47,7 @@ class Admin(User):
     """To store admin details"""
     district = CharField(max_length=50, default='')
     dob = DateTimeField(default=None, null=True, blank=True)
+    mobile = CharField(max_length=15, default='', unique=True)
 
     class Meta:
         verbose_name_plural = 'Admins'
@@ -59,6 +59,7 @@ class RationShop(User):
     employee_id = CharField(max_length=15, default='')
     location = CharField(max_length=100, default='')
     verified = BooleanField(default=False)
+    mobile = CharField(max_length=15, default='', unique=True)
 
     class Meta:
         verbose_name_plural = 'RationShops'
@@ -74,6 +75,7 @@ class Card(User):
     card_type = IntegerField(default=CardType.WHITE,
                              choices=CardType.choices())
     verified = BooleanField(default=False)
+    mobile = CharField(max_length=15, default='', unique=True)
 
     class Meta:
         verbose_name_plural = 'Cards'
