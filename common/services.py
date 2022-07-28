@@ -6,9 +6,9 @@ from common.exceptions import BadRequest
 def send_otp(to, body):
     url = "https://www.fast2sms.com/dev/bulkV2"
     querystring = {"authorization": os.environ['fas2sms_api'],
+                   "sender_id": "TXTIND",
                    "message": body,
-                   "language": "english",
-                   "route": "q",
+                   "route": "v3",
                    "numbers": str(to)}
 
     headers = {
