@@ -49,6 +49,7 @@ class IsShop(permissions.BasePermission):
 
     def has_permission(self, request, view):
         if view.kwargs['user'].type == UserType.SHOP:
+            view.kwargs['shop'] = view.kwargs['user'].rationshop
             return True
         raise BadRequest("No permission")
 

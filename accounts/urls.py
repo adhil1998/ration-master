@@ -1,7 +1,7 @@
 from django.urls import path
 from accounts.views import AdminCreateView, ShopCreateView, CardCreateView, \
     LoginView, CreateOtp, LoginOTPView, VerifyCardView, VerifyShopView, MemberListCreate, CardDetailView, \
-    ShopDetailView, ShopListView
+    ShopDetailView, ShopListView, AdminDashboardView, ShopDashboardView
 
 urlpatterns = [
     path(r'signup/admin/', AdminCreateView .as_view()),
@@ -19,4 +19,7 @@ urlpatterns = [
     path(r'delete/shop/<idencode:pk>/', VerifyShopView .as_view()),
     path(r'member/', MemberListCreate.as_view()),
 
+    #dashboard
+    path(r'admin/dashboard/', AdminDashboardView .as_view()),
+    path(r'shop/dashboard/', ShopDashboardView .as_view())
 ]

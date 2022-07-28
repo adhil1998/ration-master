@@ -13,6 +13,8 @@ from common.services import send_otp
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from supply.models import Token
+
 
 class AdminCreateView(CreateAPIView, RetrieveAPIView):
     """Serializer for lis and create User(s)"""
@@ -176,3 +178,37 @@ class ShopListView(ListAPIView):
     serializer_class = ShopLiteSerializer
     queryset = RationShop.objects.all()
     filterset_class = ShopFilter
+
+
+class AdminDashboardView(APIView):
+    permission_classes = (IsAuthenticated, IsAdmin)
+
+    def get(self, request, *args, **kwargs):
+        """Override get"""
+        data = {
+            "total_card": Card.objects.all().count(),
+            "verified_cards": Card.objects.filter(verified=True).count(),
+            "non_verified_cards": Card.objects.filter(verified=False).count(),
+            "total_shops": RationShop.objects.all().count(),
+            "verified_shops": RationShop.objects.filter(verified=True).count(),
+            "non_verified_shops": RationShop.objects.filter(verified=False).count(),
+
+        }
+        return success_response(data)
+
+
+class ShopDashboardView(APIView):
+    permission_classes = (IsAuthenticated, IsShop)
+
+    def get(self, request, *args, **kwargs):
+        """Override get"""
+        data = {
+            "total_tokens": Token.objects.all().count(),
+            "remaining_tokens": Token.objects.filter(
+                status=TokenStatus.INITIATED, shop=self.kwargs['shop']).count(),
+            "completed_tokens": Token.objects.filter(
+                status=TokenStatus.COMPLETED, shop=self.kwargs['shop']).count(),
+            "canceled_tokens": Token.objects.filter(
+                status=TokenStatus.CANCELED, shop=self.kwargs['shop']).count(),
+        }
+        return success_response(data)
