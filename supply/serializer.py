@@ -83,6 +83,7 @@ class HolidaysSerializer(serializers.ModelSerializer):
 class PublicHolidaysSerializer(serializers.ModelSerializer):
     """"""
     date = DateField()
+
     class Meta:
         model = PublicHolidays
         fields = ['holidays', 'date']
@@ -123,7 +124,7 @@ class TokenSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Token
-        fields = ['card', 'shop', 'number', 'time', 'status']
+        fields = ['idencode', 'card', 'shop', 'number', 'time', 'status', ]
         extra_kwargs = {
             'time': {'read_only': True},
             'number': {'read_only': True}

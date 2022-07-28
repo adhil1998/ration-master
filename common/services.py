@@ -15,4 +15,3 @@ def send_otp(to, body):
         'cache-control': "no-cache"
     }
     response = requests.request("GET", url, headers=headers, params=querystring)
-    print(response.text)

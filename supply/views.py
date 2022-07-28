@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.shortcuts import render
 from rest_framework.generics import ListAPIView, ListCreateAPIView, \
     RetrieveAPIView, UpdateAPIView
@@ -92,7 +94,7 @@ class TokenView(ListCreateAPIView, RetrieveAPIView, UpdateAPIView,
     queryset = Token.objects.all().order_by('number')
     filterset_class = TokenFilter
 
-    def patch(self, request, pk, **kwargs):
+    def patch(self, request, *args, **kwargs):
         """Override update method"""
         instance = self.get_object()
         validated_data = self.request.data
@@ -111,6 +113,13 @@ class TokenView(ListCreateAPIView, RetrieveAPIView, UpdateAPIView,
         return success_response(TokenSerializer(instance).data, 'Updated')
 
 
+class TokenDetailIdView(RetrieveAPIView):
+    """"""
+    permission_classes = (IsAuthenticated, )
+    serializer_class = TokenSerializer
+    queryset = Token.objects.all()
+
+
 class TokenDetailView(RetrieveAPIView, MultiPermissionView):
     """"""
     permissions = {
@@ -121,7 +130,10 @@ class TokenDetailView(RetrieveAPIView, MultiPermissionView):
     def get_object(self):
         """"""
         try:
-            token = Token.objects.get(card=self.kwargs['card'])
+            token = Token.objects.get(card=self.kwargs['card'],
+                                      time__year=datetime.now().year,
+                                      time__month=datetime.now().month,
+                                      status__in=[TokenStatus.COMPLETED, TokenStatus.INITIATED])
         except:
             raise BadRequest('NO ACTIVE TOKENS')
         return token

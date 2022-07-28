@@ -2,7 +2,7 @@ from django.urls import path
 
 from supply.models import Purchase
 from supply.views import ProductView, StockView, MonthlyQuotaView, HolidaysView, \
-    PublicHolidaysView, TokenView, PurchaseView, StockUpdateView
+    PublicHolidaysView, TokenView, PurchaseView, StockUpdateView, TokenDetailView, TokenDetailIdView
 
 urlpatterns = [
     path(r'products/', ProductView .as_view()),
@@ -14,7 +14,8 @@ urlpatterns = [
     path(r'public/holiday/', PublicHolidaysView .as_view()),
     path(r'token/create/', TokenView .as_view()),
     path(r'token/', TokenView .as_view()),
-    path(r'token/active/', TokenView.as_view()),
+    path(r'token/active/', TokenDetailView .as_view()),
+    path(r'token/get/<idencode:pk>/', TokenDetailIdView.as_view()),
     path(r'token/update/<idencode:pk>/', TokenView.as_view()),
     path(r'purchase/', PurchaseView.as_view()),
 ]
