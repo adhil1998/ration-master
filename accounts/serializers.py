@@ -59,6 +59,7 @@ class ShopSerializer(serializers.ModelSerializer):
         stock_list = []
         for stock in stocks:
             data = {
+                "product_idencode": stock.product.idencode,
                 "name": stock.product.name,
                 "quantity": stock.quantity,
                 "unit": stock.product.unit
