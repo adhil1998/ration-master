@@ -14,7 +14,7 @@ from common.services import send_otp
 from supply.constants import TokenStatus
 from supply.models import Product, Stock, MonthlyQuota, Holidays, PublicHolidays, \
     Token, Purchase
-from supply.utilities import create_token_time
+from supply.utilities import create_token_time, available_quota
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -154,5 +154,6 @@ class TokenSerializer(serializers.ModelSerializer):
                 "card": CardSerializer(instance.card).data,
                 "number": instance.number,
                 "status": instance.status,
+                "available": available_quota(instance),
                 "purchase": PurchaseSerializer(instance.purchase.all(), many=True).data}
         return data
