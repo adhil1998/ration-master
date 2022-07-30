@@ -24,7 +24,7 @@ class ProductView(ListCreateAPIView):
     """View for product list and create"""
     permission_classes = (IsAuthenticated, IsAdmin)
     serializer_class = ProductSerializer
-    queryset = Product.objects.all()
+    queryset = Product.objects.all().order_by('-id')
 
 
 class StockView(ListCreateAPIView, MultiPermissionView):
@@ -34,7 +34,7 @@ class StockView(ListCreateAPIView, MultiPermissionView):
         'POST': (IsAuthenticated, IsAdmin)
     }
     serializer_class = StockSerializer
-    queryset = Stock.objects.all()
+    queryset = Stock.objects.all().order_by('-id')
     filterset_class = StockFilter
 
 
