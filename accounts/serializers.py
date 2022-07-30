@@ -76,6 +76,7 @@ class ShopSerializer(serializers.ModelSerializer):
                 token__status=TokenStatus.INITIATED).aggregate(Sum(
                 'quantity', default=0))['quantity__sum']
             data = {
+                "product_idencode": stock.product.idencode,
                 "name": stock.product.name,
                 "quantity": stock.quantity - purchased_quantity,
                 "unit": stock.product.unit
