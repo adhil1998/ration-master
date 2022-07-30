@@ -1,8 +1,8 @@
 from django.urls import path
 
-from supply.models import Purchase
 from supply.views import ProductView, StockView, MonthlyQuotaView, HolidaysView, \
-    PublicHolidaysView, TokenView, PurchaseView, StockUpdateView, TokenDetailView, TokenDetailIdView
+    PublicHolidaysView, TokenView, PurchaseView, StockUpdateView, TokenDetailView, TokenDetailIdView, \
+    NotificationListCreateView
 
 urlpatterns = [
     path(r'products/', ProductView .as_view()),
@@ -18,4 +18,5 @@ urlpatterns = [
     path(r'token/get/<idencode:pk>/', TokenDetailIdView.as_view()),
     path(r'token/update/<idencode:pk>/', TokenView.as_view()),
     path(r'purchase/', PurchaseView.as_view()),
+    path(r'notification/', NotificationListCreateView.as_view()),
 ]

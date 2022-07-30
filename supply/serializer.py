@@ -13,7 +13,7 @@ from common.fields import IdencodeField, KWArgsObjectField
 from common.services import send_otp
 from supply.constants import TokenStatus
 from supply.models import Product, Stock, MonthlyQuota, Holidays, PublicHolidays, \
-    Token, Purchase
+    Token, Purchase, Notification
 from supply.utilities import create_token_time, available_quota
 
 
@@ -157,3 +157,11 @@ class TokenSerializer(serializers.ModelSerializer):
                 "available": available_quota(instance),
                 "purchase": PurchaseSerializer(instance.purchase.all(), many=True).data}
         return data
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    """"""
+
+    class Meta:
+        model = Notification
+        fields = ['content', 'idencode', 'date', 'type']

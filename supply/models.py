@@ -6,7 +6,7 @@ from common.functions import encode
 from common.models import AbstractBaseModel
 from supply.constants import UnitType, TokenStatus
 from accounts.models import RationShop, User, Card
-from accounts.constants import CardType, AgeGroupType
+from accounts.constants import CardType, AgeGroupType, UserType
 
 
 # Create your models here.
@@ -97,4 +97,11 @@ class PublicHolidays(AbstractBaseModel):
         unique_together = ['current_year', 'current_month']
 
 
+class Notification(AbstractBaseModel):
+    """"""
+    content = TextField()
+    date = DateField(auto_now_add=True, null=True)
+    type = IntegerField(default=UserType.ADMIN, choices=UserType.choices())
 
+    def __str__(self):
+        return self.content

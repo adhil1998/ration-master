@@ -1,9 +1,11 @@
 from datetime import datetime
 
 from django.shortcuts import render
+from rest_framework.decorators import permission_classes
 from rest_framework.generics import ListAPIView, ListCreateAPIView, \
     RetrieveAPIView, UpdateAPIView
 
+from accounts.constants import UserType
 from common.exceptions import BadRequest
 from common.permissions import IsAuthenticated, IsAdmin, MultiPermissionView, IsShop, IsCard
 from common.functions import success_response, decode
@@ -13,9 +15,9 @@ from rest_framework.response import Response
 # Create your views here.
 from supply.constants import TokenStatus
 from supply.filter import StockFilter, TokenFilter
-from supply.models import Product, Stock, MonthlyQuota, Holidays, PublicHolidays, Token, Purchase
+from supply.models import Product, Stock, MonthlyQuota, Holidays, PublicHolidays, Token, Purchase, Notification
 from supply.serializer import ProductSerializer, StockSerializer, MonthlyQuotaSerializer, HolidaysSerializer, \
-    PublicHolidaysSerializer, TokenSerializer, PurchaseSerializer
+    PublicHolidaysSerializer, TokenSerializer, PurchaseSerializer, NotificationSerializer
 
 
 class ProductView(ListCreateAPIView):
@@ -147,3 +149,21 @@ class PurchaseView(ListCreateAPIView, RetrieveAPIView, MultiPermissionView):
     }
     serializer_class = PurchaseSerializer
     queryset = Purchase.objects.all()
+
+
+class NotificationListCreateView(ListCreateAPIView, MultiPermissionView):
+    """"""
+    permissions = {
+        'GET': (IsAuthenticated,),
+        'POST': (IsAuthenticated, IsAdmin)
+    }
+    serializer_class = NotificationSerializer
+
+    def get_queryset(self):
+        """"""
+        queryset = Notification.objects.all().order_by('date')
+        if self.kwargs['user'].type in [UserType.CARD, UserType.SHOP]:
+            return queryset.filter(type=self.kwargs['user'].type)
+        return queryset
+
+
