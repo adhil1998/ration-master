@@ -52,6 +52,9 @@ class Purchase(AbstractBaseModel):
     class Meta:
         unique_together = ['token', 'product']
 
+    def __str__(self):
+        return self.product.name + ' ' + self.token.card.holder_name
+
 
 class MonthlyQuota(AbstractBaseModel):
     """To store product quantity availabale for each card owner"""

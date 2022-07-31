@@ -54,14 +54,15 @@ class StockUpdateView(UpdateAPIView, MultiPermissionView):
         return success_response(StockSerializer(stock).data)
 
 
-class MonthlyQuotaView(ListCreateAPIView, UpdateAPIView):
+class MonthlyQuotaView(ListCreateAPIView, UpdateAPIView, MultiPermissionView):
     """"""
     permissions = {
         'GET': (IsAuthenticated,),
-        'POST': (IsAuthenticated, IsAdmin)
+        'POST': (IsAuthenticated, IsAdmin),
+        'PATCH': (IsAuthenticated, IsAdmin)
     }
     serializer_class = MonthlyQuotaSerializer
-    queryset = MonthlyQuota.objects.all()
+    queryset = MonthlyQuota.objects.all().order_by('-id')
 
 
 class HolidaysView(ListCreateAPIView, MultiPermissionView):
